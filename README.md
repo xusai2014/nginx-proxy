@@ -53,3 +53,22 @@ iptables -A INPUT -p tcp --dport 6666 -j ACCEPT
 openssl dhparam -out dhparam.pem 2048
 
 https://www.ssllabs.com/ssltest/analyze.html?d=www.chejj.cc
+
+
+[OCSP](http://cooolin.com/scinet/2020/07/16/ocsp-stapling-nginx.html)
+
+获取OCSP URL
+```shell
+openssl x509 -noout -ocsp_uri -in cert.pem
+
+```
+根据上面URL生成stapling file
+```shell
+openssl ocsp -no_nonce -respout ./cen2.pw.der -verify_other chain.pem -issuer ./chain.pem -cert ./cert.pem -header "HOST=ocsp.int-x3.letsencrypt.org" -url http://ocsp.int-x3.letsencrypt.org/
+
+```
+
+```shell
+openssl ocsp -issuer chain.pem -cert cert.pem -verify_other chain.pem -header "Host=ocsp.int-x3.letsencrypt.org" -text -url http://ocsp.int-x3.letsencrypt.org
+```
+openssl ocsp -no_nonce -respout ./cen2.pw.der -verify_other chain.pem -issuer ./chain.pem -cert ./cert.pem -header "HOST=ocsp.int-x3.letsencrypt.org" -url http://ocsp.int-x3.letsencrypt.org/
