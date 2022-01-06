@@ -19,10 +19,17 @@ certbot certonly -d app.example.com -d api.example.com
 
 
 
-
+[泛解析配置](https://eff-certbot.readthedocs.io/en/stable/using.html#certbot-commands)
+```shell
 certbot certonly --manual --preferred-challenges http -d *.chejj.cc --server https://acme-staging-v02.api.letsencrypt.org/directory --config-dir ./https-file --work-dir ./https-file --logs-dir ./https-file
 
+```
+
 配置TXT DNS解析记录
+
+
+HTTPS Verify
+https://www.sslshopper.com/ssl-checker.html#hostname=www.chejj.cc
 
 ## 排查问题
 扫描端口是否监听
