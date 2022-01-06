@@ -1,4 +1,4 @@
 # bin/bash!
 
-mv nginx.conf /etc/nginx/nginx.conf
-mv scripts/* /etc/nginx/scripts
+\cp -rf nginx.conf /etc/nginx/nginx.conf #强制覆盖
+\cp -rf "${cwd}scripts/"* /etc/nginx/scripts #强制覆盖
