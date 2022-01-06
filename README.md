@@ -50,3 +50,6 @@ yum -y install iptables-services
 ```shell
 iptables -A INPUT -p tcp --dport 6666 -j ACCEPT 
 ```
+openssl dhparam -out dhparam.pem 2048
+
+https://www.ssllabs.com/ssltest/analyze.html?d=www.chejj.cc
