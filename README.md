@@ -23,3 +23,23 @@ certbot certonly -d app.example.com -d api.example.com
 certbot certonly --manual --preferred-challenges http -d *.chejj.cc --server https://acme-staging-v02.api.letsencrypt.org/directory --config-dir ./https-file --work-dir ./https-file --logs-dir ./https-file
 
 配置TXT DNS解析记录
+
+## 排查问题
+扫描端口是否监听
+
+```shell
+netstat -nltp | grep
+``` 
+80 命令，查看80端口是否已经被正常监听
+
+```shell
+systemctl stop firewalld.service
+```
+
+防火墙管理
+
+yum -y install iptables-services
+
+```shell
+iptables -A INPUT -p tcp --dport 6666 -j ACCEPT 
+```
