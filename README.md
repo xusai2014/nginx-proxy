@@ -64,11 +64,12 @@ openssl x509 -noout -ocsp_uri -in cert.pem
 ```
 根据上面URL生成stapling file
 ```shell
-openssl ocsp -no_nonce -respout ./cen2.pw.der -verify_other chain.pem -issuer ./chain.pem -cert ./cert.pem -header "HOST=ocsp.int-x3.letsencrypt.org" -url http://ocsp.int-x3.letsencrypt.org/
-
+openssl ocsp -no_nonce -respout ./cen2.pw.der -verify_other chain.pem -issuer ./chain.pem -cert ./cert.pem -header "HOST=stg-r3.o.lencr.org" -url http://stg-r3.o.lencr.org
 ```
 
 ```shell
 openssl ocsp -issuer chain.pem -cert cert.pem -verify_other chain.pem -header "Host=ocsp.int-x3.letsencrypt.org" -text -url http://ocsp.int-x3.letsencrypt.org
 ```
 openssl ocsp -no_nonce -respout ./cen2.pw.der -verify_other chain.pem -issuer ./chain.pem -cert ./cert.pem -header "HOST=ocsp.int-x3.letsencrypt.org" -url http://ocsp.int-x3.letsencrypt.org/
+
+openssl s_client -connect www.chejj.cc:443 -tls1 -tlsextdebug -status < /dev/null 2>&1 | awk '{ if ($0 ~ /OCSP response: no response sent/) { print "disabled" } else if ($0 ~ /OCSP Response Status: successful/) { print "enabled" } }'
