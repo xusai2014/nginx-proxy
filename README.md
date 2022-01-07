@@ -1,10 +1,37 @@
-## HTTPS 域名泛解析
+## HTTPS 免费证书配置（包括通配符证书）
 
-[certbot](https://eff-certbot.readthedocs.io/en/stable/using.html#nginx) 证书生成
+如果启用HTTPS基于安全套接层的HTTP协议，需要从证书颁发机构（CA）申请证书。
+- letsencrypt是一个免费的CA。
+- 获取证书需要证明域名控制权。例如在主机运行[ACME协议](https://datatracker.ietf.org/doc/html/rfc8555)
 
-Mac OS
+
+通过ACME客户端来验证域名控制权并颁发证书（推荐使用certbot）
+
+例如通过[certbot](https://eff-certbot.readthedocs.io/en/stable/using.html#nginx)证明域名控制权后可申请、续期、吊销证书。
+
+- certbot 与 CA 交互生成密钥对（“授权密钥对”）
+- certbot证明该域名控制权即域名认证 （那如何进行域名认证呢？）
+
+- 首先certbot会启动并询问采用什么方式进行域名验证呢？
+- CA会提供给客户端多种方式选择，例如 DNS解析、HTTP资源请求
+- 选择其中一种验证方式
+- CA会查看该域名并向要求certbot发起验证请求
+- 除要求验证请求之外，CA还会提供一个 nonce（一次性数字）。（目的是让certbot使用私钥对它签名，以证明其对密钥对的控制权）
+- Certbot发起验证请求成功后会用私钥（“授权密钥对”）对提供的 nonce（一次性数字）进行签名，并通知CA验证完成
+- CA得到验证完成通知后会先进行签名验证，并自行获取验证请求结果
+
+一旦代理拥有了授权公私钥，那么请求、续期和撤销证书就会变得很简单——只需发送证书管理消息并使用授权私钥对其进行签名。（那如何进行证书颁发呢？）
+- certbot创建一个 PKCS#10 证书签名请求（CSR），要求 CA 为指定的公钥颁发已验证控制权域名的证书。
+- CSR 中包含公钥及该公钥对应的私钥的签名。
+- certbot还使用域名授权私钥签署整个 CSR，以便 Let’s Encrypt CA 知道它已获得授权。
+- CA会对授权、私钥两个签名进行验证，一切正常则为该公钥颁发证书并返回给cerbot
+
+当 Let’s Encrypt CA 收到请求时，它会验证这两个签名。如果一切正常，CA 将为 CSR 中的公钥颁发 example.com 的证书，并将文件发送回证书管理软件。
+
+
+CentOS
 ```shell
-brew install certbot
+sudo snap install --classic certbot
 # Obtain and install a certificate:
 certbot
 
@@ -17,57 +44,51 @@ certbot certonly -d example.com -d www.example.com
 certbot certonly -d app.example.com -d api.example.com
 ```
 
+[泛解析配置](https://eff-certbot.readthedocs.io/en/stable/using.html#certbot-commands) 如下：
 
-
-[泛解析配置](https://eff-certbot.readthedocs.io/en/stable/using.html#certbot-commands)
+选取DNS验证方式
 ```shell
 certbot certonly --manual --preferred-challenges=dns-01 -d *.chejj.cc --server https://acme-v02.api.letsencrypt.org/directory --config-dir ./https-file --work-dir ./https-file --logs-dir ./https-file
 
 ```
+再次过程只能够配置TXT DNS解析验证,最后生成证书文件。
 
-配置TXT DNS解析记录
+
+[HTTPS Verify](https://www.sslshopper.com/ssl-checker.html#hostname=www.chejj.cc)
 
 
-HTTPS Verify
-https://www.sslshopper.com/ssl-checker.html#hostname=www.chejj.cc
-
-## 排查问题
-扫描端口是否监听
-
+## 实操中遇到需要排查问题点
+查看80端口是否已经被正常监听 （阿里云存在安全组和防火墙软件对相关端口进行开放）
 ```shell
-netstat -nltp | grep
-``` 
-80 命令，查看80端口是否已经被正常监听
-
+netstat -nltp | grep 80
+```
 ```shell
 systemctl stop firewalld.service
+# or
+systemctl stop iptables.service
 ```
 
-防火墙管理
-
-yum -y install iptables-services
-
+或者防火墙管理
 ```shell
+yum -y install iptables-services
 iptables -A INPUT -p tcp --dport 6666 -j ACCEPT 
 ```
-openssl dhparam -out dhparam.pem 2048
 
-https://www.ssllabs.com/ssltest/analyze.html?d=www.chejj.cc
-
-
-[OCSP](http://cooolin.com/scinet/2020/07/16/ocsp-stapling-nginx.html)
+[OCSP](http://cooolin.com/scinet/2020/07/16/ocsp-stapling-nginx.html) 在线证书状态协议
+OCSP协议的产生是用于在公钥基础设施（PKI）体系中替代证书吊销列表（CRL）来查询数字证书的状态，当用户试图访问一个服务器时，在线证书状态协议发送一个对于证书状态信息的请求。服务器回复一个“有效”、“过期”或“未知”的响应。
 
 获取OCSP验证URL
 ```shell
 openssl x509 -noout -ocsp_uri -in cert.pem
+# https://r3.o.lencr.org
 ```
 发起一个OCSP验证请求
 ```shell
-openssl ocsp -issuer chain.pem -cert cert.pem -verify_other chain.pem -header "Host=stg-r3.o.lencr.org" -text -url http://stg-r3.o.lencr.org
+openssl ocsp -issuer chain.pem -cert cert.pem -verify_other chain.pem -header "Host=r3.o.lencr.org" -text -url http://r3.o.lencr.org
 ```
-根据上面URL生成stapling file
+生成stapling file
 ```shell
-openssl ocsp -no_nonce -respout ./cen2.pw.der -verify_other chain.pem -issuer ./chain.pem -cert ./cert.pem -header "HOST=stg-r3.o.lencr.org" -url http://stg-r3.o.lencr.org
+openssl ocsp -no_nonce -respout ./cen2.pw.der -verify_other chain.pem -issuer ./chain.pem -cert ./cert.pem -header "HOST=r3.o.lencr.org" -url http://r3.o.lencr.org
 ```
 
 
