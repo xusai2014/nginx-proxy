@@ -1,42 +1,42 @@
 ## 网络安全
-
+![img.png](docs/public/https-img.png)
 HTTP请求是明文传输且存在中间人抓包、篡改，伪站点冒充等问题，使用HTTPS协议有如下优势：
-- 身份认证
-- 信息加密
-- 完整性校验
-
-加密采用的是混合加密，对称加密、非对称加密。
-数字签名采用哈希摘要
+- 身份认证（CA数字证书）
+- 信息加密（混合加密，对称加密、非对称加密）
+- 完整性校验 （哈希摘要）
 
 #### SSL如何建立连接？
+![img.png](docs/public/img.png)
 - (client request)  
-  - browser向server发送请求，提供随机值1和支持的加密算法列表 
+  - browser向server发送请求，包括随机值1和支持的加密算法列表 
 - (server response) 
   - server向client返回随机值2和匹配好的协商加密算法          
 - (server response) 
-  - server向client二次返回数字证书                        
+  - server向client二次返回数字证书（包含服务端公钥）                        
 - (browser CA verify)  
-  - browser解析数字证书并验证证书有效性,并生成一个随即值（预主秘钥）。
+  - browser解析数字证书并验证证书有效性
+  - 生成一个随即值（预主秘钥）。
 - (browser generate secrets)
-  - 再通过随机值1、随机值2和预主秘钥组装会话秘钥。
+  - 通过随机值1、随机值2和预主秘钥组装会话秘钥。
   - 然后通过证书的公钥加密会话秘钥。
 - (browser request) 
   - 传送加密信息即证书加密后的会话秘钥
 - (server verify) 
   - 解密得到随机值1、随机值2和预主秘钥，然后组装会话秘钥，跟客户端会话秘钥相同
 - (browser request) 
-  - browser通过会话秘钥加密一条消息发送给server，主要验证server是否正常接受browser加密的消息。
+  - browser通过会话秘钥加密一条消息发送给server，验证server是否正常接受加密的消息。
 - (server response) 
-  - 同样服务端也会通过会话秘钥加密一条消息回传给客户端,如果客户端能够正常接受的话表明SSL层连接建立完成了。
+  - 同样server也会通过会话秘钥加密一条消息回传给browser,如果能够正常接受表明SSL层连接建立完成了。
+
 
 HTTPS在传输的过程中会涉及到三个密钥：
 - 服务器端的公钥和私钥，用来进行非对称加密 
 - 客户端生成的随机密钥，用来进行对称加密
 
 
-
-
 ## HTTPS 免费证书配置（包括通配符证书）
+
+![img.png](docs/public/lets-img.png)
 
 如果启用HTTPS基于安全套接层的HTTP协议，需要从证书颁发机构（CA）申请证书。
 - letsencrypt是一个免费的CA。
@@ -143,6 +143,14 @@ openssl ocsp -issuer chain.pem -cert cert.pem -verify_other chain.pem -header "H
 ```shell
 openssl ocsp -no_nonce -respout ./cen2.pw.der -verify_other chain.pem -issuer ./chain.pem -cert ./cert.pem -header "HOST=r3.o.lencr.org" -url http://r3.o.lencr.org
 ```
-
-
+验证是否开启
+```shell
 openssl s_client -connect www.chejj.cc:443 -tls1 -tlsextdebug -status < /dev/null 2>&1 | awk '{ if ($0 ~ /OCSP response: no response sent/) { print "disabled" } else if ($0 ~ /OCSP Response Status: successful/) { print "enabled" } }'
+```
+
+
+#### 假如CA不可信
+什么是 DNS CAA
+DNS Certification Authority Authorization（DNS证书颁发机构授权，简称 CAA）是一项借助互联网的域名系统（DNS），使域持有人可以指定允许为其域签发证书的数字证书认证机构（CA）的技术。
+
+https://sslmate.com/caa/
