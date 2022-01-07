@@ -9,15 +9,25 @@ HTTP请求是明文传输且存在中间人抓包、篡改，伪站点冒充等�
 数字签名采用哈希摘要
 
 SSL如何建立连接？
-- (client request)  browser向server发送请求，提供随机值1和支持的加密算法列表 
-- (server response) server向client返回随机值2和匹配好的协商加密算法          
-- (server response) server向client二次返回数字证书                        
-- (browser CA verify)  browser解析数字证书并验证证书有效性,并生成一个随即值（预主秘钥）。
-- (browser generate secrets)再通过随机值1、随机值2和预主秘钥组装会话秘钥。然后通过证书的公钥加密会话秘钥
-- (browser request) 传送加密信息即证书加密后的会话秘钥
-- (server verify) 解密得到随机值1、随机值2和预主秘钥，然后组装会话秘钥，跟客户端会话秘钥相同
-- (browser request) browser通过会话秘钥加密一条消息发送给server，主要验证server是否正常接受browser加密的消息。
-- (server response) 同样服务端也会通过会话秘钥加密一条消息回传给客户端,如果客户端能够正常接受的话表明SSL层连接建立完成了。
+- (client request)  
+  - browser向server发送请求，提供随机值1和支持的加密算法列表 
+- (server response) 
+  - server向client返回随机值2和匹配好的协商加密算法          
+- (server response) 
+  - server向client二次返回数字证书                        
+- (browser CA verify)  
+  - browser解析数字证书并验证证书有效性,并生成一个随即值（预主秘钥）。
+- (browser generate secrets)
+  - 再通过随机值1、随机值2和预主秘钥组装会话秘钥。
+  - 然后通过证书的公钥加密会话秘钥。
+- (browser request) 
+  - 传送加密信息即证书加密后的会话秘钥
+- (server verify) 
+  - 解密得到随机值1、随机值2和预主秘钥，然后组装会话秘钥，跟客户端会话秘钥相同
+- (browser request) 
+  - browser通过会话秘钥加密一条消息发送给server，主要验证server是否正常接受browser加密的消息。
+- (server response) 
+  - 同样服务端也会通过会话秘钥加密一条消息回传给客户端,如果客户端能够正常接受的话表明SSL层连接建立完成了。
 
 HTTPS在传输的过程中会涉及到三个密钥：
 - 服务器端的公钥和私钥，用来进行非对称加密 
