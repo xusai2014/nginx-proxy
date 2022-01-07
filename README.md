@@ -8,7 +8,7 @@ HTTP请求是明文传输且存在中间人抓包、篡改，伪站点冒充等�
 加密采用的是混合加密，对称加密、非对称加密。
 数字签名采用哈希摘要
 
-SSL如何建立连接？
+#### SSL如何建立连接？
 - (client request)  
   - browser向server发送请求，提供随机值1和支持的加密算法列表 
 - (server response) 
@@ -43,12 +43,14 @@ HTTPS在传输的过程中会涉及到三个密钥：
 - 获取证书需要证明域名控制权。例如在主机运行[ACME协议](https://datatracker.ietf.org/doc/html/rfc8555)
 
 
-通过ACME客户端来验证域名控制权并颁发证书（推荐使用certbot）
+### 通过ACME客户端来验证域名控制权并颁发证书（推荐使用certbot）
 
-例如通过[certbot](https://eff-certbot.readthedocs.io/en/stable/using.html#nginx) 证明域名控制权后可申请、续期、吊销证书。
+通过[certbot](https://eff-certbot.readthedocs.io/en/stable/using.html#nginx) 证明域名控制权后，方可申请、续期、吊销证书。
 
 - certbot 与 CA 交互生成密钥对（“授权密钥对”）
-- certbot证明该域名控制权即域名认证 （那如何进行域名认证呢？）
+- certbot证明该域名控制权即域名认证 
+
+（那如何进行域名认证呢？）
 
 - 首先certbot会启动并询问采用什么方式进行域名验证呢？
 - CA会提供给客户端多种方式选择，例如 DNS解析、HTTP资源请求
