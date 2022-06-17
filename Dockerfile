@@ -6,6 +6,6 @@ COPY nginx.conf /etc/nginx
 COPY scripts /etc/nginx/scripts
 COPY html /usr/share/nginx/html
 
-
+ENV TZ Asia/Shanghai
 CMD ["nginx", "-g", "daemon off;"]
 
