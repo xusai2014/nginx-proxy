@@ -101,13 +101,13 @@ certbot certonly -d app.example.com -d api.example.com
 
 选取DNS验证方式
 ```shell
-certbot certonly --manual --preferred-challenges=dns-01 -d *.chejj.cc --server https://acme-v02.api.letsencrypt.org/directory --config-dir ./https-file --work-dir ./https-file --logs-dir ./https-file
+certbot certonly --manual --preferred-challenges=dns-01 -d *.flygpt.cc --server https://acme-v02.api.letsencrypt.org/directory --config-dir ./https-file --work-dir ./https-file --logs-dir ./https-file
 
 ```
 再次过程只能够配置TXT DNS解析验证,最后生成证书文件。
 
 
-[HTTPS Verify](https://www.sslshopper.com/ssl-checker.html#hostname=www.chejj.cc)
+[HTTPS Verify](https://www.sslshopper.com/ssl-checker.html#hostname=www.flygpt.cc)
 
 
 ## 实操中遇到需要排查问题点
@@ -145,7 +145,7 @@ openssl ocsp -no_nonce -respout ./cen2.pw.der -verify_other chain.pem -issuer ./
 ```
 验证是否开启
 ```shell
-openssl s_client -connect www.chejj.cc:443 -tls1 -tlsextdebug -status < /dev/null 2>&1 | awk '{ if ($0 ~ /OCSP response: no response sent/) { print "disabled" } else if ($0 ~ /OCSP Response Status: successful/) { print "enabled" } }'
+openssl s_client -connect www.flygpt.cc:443 -tls1 -tlsextdebug -status < /dev/null 2>&1 | awk '{ if ($0 ~ /OCSP response: no response sent/) { print "disabled" } else if ($0 ~ /OCSP Response Status: successful/) { print "enabled" } }'
 ```
 
 

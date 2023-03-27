@@ -1,1 +1,1 @@
-certbot certonly --manual --preferred-challenges  dns -d *.chejj.cc --server https://acme-staging-v02.api.letsencrypt.org/directory --config-dir ./https-file --work-dir ./https-file --logs-dir ./https-file
+certbot certonly --manual --preferred-challenges  dns -d *.flygpt.cc --server https://acme-staging-v02.api.letsencrypt.org/directory --config-dir ./https-file --work-dir ./https-file --logs-dir ./https-file
