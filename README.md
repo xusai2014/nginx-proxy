@@ -104,6 +104,10 @@ certbot certonly -d app.example.com -d api.example.com
 certbot certonly --manual --preferred-challenges=dns-01 -d *.flygpt.cc --server https://acme-v02.api.letsencrypt.org/directory --config-dir ./https-file --work-dir ./https-file --logs-dir ./https-file
 
 ```
+
+````shell
+openssl dhparam -out ssl-dhparams.pem 2048
+````
 再次过程只能够配置TXT DNS解析验证,最后生成证书文件。
 
 
